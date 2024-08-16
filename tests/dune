@@ -1,0 +1,4 @@
+(test 
+  (name test) 
+  (libraries meat ounit2 batteries)
+)

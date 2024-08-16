@@ -1,0 +1,6 @@
+# dune init proj ninety_nine_problems
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Shared cache location: /Users/jared.kane/.cache/dune/db
+# Workspace root: /Users/jared.kane/Documents/Ocaml/ninety_nine_problems
+# Auto-detected concurrency: 12
