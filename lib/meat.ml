@@ -267,4 +267,49 @@ let full_words num =
   num |> reducinator [] |> aux ""
 ;;
 
+let is_prime num =
+  let num = abs num in
+  let rec aux counter is_true =
+    if (not is_true) || num < 2
+    then false
+    else if counter = num || counter * counter > num
+    then true
+    else aux (counter + 1) (num mod counter <> 0)
+  in
+  if num < 2 then false else aux 2 true
+;;
+
+let gcd n1 n2 =
+  let big = if n1 >= n2 then n1 else n2 in
+  let small = if n1 < n2 then n1 else n2 in
+  let rec aux small big =
+    if big mod small = 0 then small else aux (big mod small) small
+  in
+  aux small big
+;;
+
+let coprime n1 n2 = gcd n1 n2 = 1
+
+let phi num =
+  let rec aux counter =
+    if counter = num
+    then 0
+    else if coprime counter num
+    then 1 + aux (counter + 1)
+    else aux (counter + 1)
+  in
+  aux 1
+;;
+
+let factors num =
+  let rec aux counter num acc =
+    if counter = num
+    then rev (num :: acc)
+    else if num mod counter = 0
+    then aux counter (num / counter) (counter :: acc)
+    else aux (counter + 1) num acc
+  in
+  aux 2 num []
+;;
+
 let () = ()
