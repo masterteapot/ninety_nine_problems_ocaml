@@ -159,4 +159,112 @@ let slice ls i k =
   aux 0 [] ls
 ;;
 
+let rotate ls i =
+  let rec aux counter acc = function
+    | [] -> rev acc
+    | hd :: tl when counter = i -> tl @ rev (hd :: acc)
+    | hd :: tl -> aux (counter + 1) (hd :: acc) tl
+  in
+  aux 1 [] ls
+;;
+
+let remove_at i ls =
+  let rec aux counter acc = function
+    | [] -> rev acc
+    | _ :: tl when counter = i -> rev acc @ tl
+    | hd :: tl -> aux (counter + 1) (hd :: acc) tl
+  in
+  aux 0 [] ls
+;;
+
+let insert_at el i ls =
+  let rec aux counter acc = function
+    | [] -> rev (el :: acc)
+    | hd :: tl when counter = i -> rev (el :: acc) @ (hd :: tl)
+    | hd :: tl -> aux (counter + 1) (hd :: acc) tl
+  in
+  aux 0 [] ls
+;;
+
+let range i k =
+  let operator = if i <= k then ( + ) else ( - ) in
+  let rec aux counter acc =
+    if counter = k then rev (counter :: acc) else aux (operator counter 1) (counter :: acc)
+  in
+  aux i []
+;;
+
+let rand_select ls num =
+  let rec get_rand_indicies counter acc =
+    if counter = num
+    then acc
+    else get_rand_indicies (counter + 1) (Random.int (length ls) :: acc)
+  in
+  let rand_ls = get_rand_indicies 0 [] in
+  List.map (fun x -> nth ls x) rand_ls
+;;
+
+let lotto_select i k =
+  let rec get_rand_indicies counter acc =
+    if counter = 0
+    then acc
+    else get_rand_indicies (counter - 1) ((Random.int k + 1) :: acc)
+  in
+  get_rand_indicies i []
+;;
+
+let extract i ls =
+  let rec chopper item acc = function
+    | [] -> acc
+    | ls when length ls < i - 1 -> acc
+    | hd :: tl -> chopper item ((item :: slice (hd :: tl) 0 (i - 2)) :: acc) tl
+  in
+  let rec aux acc = function
+    | [] -> acc
+    | hd :: tl -> aux (chopper hd [] tl :: acc) tl
+  in
+  if i = 1
+  then List.map (fun x -> [ x ]) ls
+  else if i <= 0
+  then [ [] ]
+  else aux [] ls |> List.flatten |> rev
+;;
+
+let length_sort ls =
+  let rec aux acc ls item =
+    match ls with
+    | [] -> rev (item :: acc)
+    | hd :: tl when length item < length hd -> List.rev acc @ (item :: hd :: tl)
+    | hd :: tl -> aux (hd :: acc) tl item
+  in
+  List.fold_left (aux []) [] ls
+;;
+
+let frequency_sort ls =
+  let rec aux acc ls item =
+    match ls with
+    | [] -> rev (item :: acc)
+    | hd :: tl when fst item < fst hd -> List.rev acc @ (item :: hd :: tl)
+    | hd :: tl -> aux (hd :: acc) tl item
+  in
+  let mapped = List.map (fun x -> length x, x) ls in
+  List.fold_left (aux []) [] mapped
+;;
+
+let full_words num =
+  let nums =
+    [| "zero"; "one"; "two"; "three"; "four"; "five"; "six"; "seven"; "eight"; "nine" |]
+  in
+  let rec reducinator acc = function
+    | 0 -> acc
+    | x -> reducinator (Int.rem x 10 :: acc) (x / 10)
+  in
+  let rec aux acc = function
+    | [] -> acc
+    | [ hd ] -> acc ^ nums.(hd)
+    | hd :: tl -> aux (acc ^ nums.(hd) ^ "-") tl
+  in
+  num |> reducinator [] |> aux ""
+;;
+
 let () = ()
