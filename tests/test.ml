@@ -2,6 +2,24 @@ open Meat
 open OUnit2
 (* open Batteries *)
 
+let example_balanced_tree =
+  Node ('x', Node ('x', Empty, Empty), Node ('x', Node ('x', Empty, Empty), Empty))
+;;
+
+let example_unbalanced_tree =
+  Node
+    ( 'x'
+    , Node ('x', Node ('x', Empty, Empty), Empty)
+    , Node ('x', Node ('x', Node ('x', Empty, Node ('x', Empty, Empty)), Empty), Empty) )
+;;
+
+let example_unbalanced_tree_v2 =
+  Node
+    ( 'x'
+    , Node ('x', Node ('x', Node ('x', Empty, Node ('x', Empty, Empty)), Empty), Empty)
+    , Node ('x', Node ('x', Empty, Empty), Empty) )
+;;
+
 let tests =
   "test suite for stats"
   >::: [ ("last item in string"
@@ -181,7 +199,42 @@ let tests =
        ; ("Euler's totient function to find number of coprime numbers"
           >:: fun _ -> assert_equal 4 (phi 10))
        ; ("Find lowest factors of a number"
-          >:: fun _ -> assert_equal ([3; 3; 5; 7]) (factors 315))
+          >:: fun _ -> assert_equal [ 3; 3; 5; 7 ] (factors 315))
+       ; ("Find number of nodes"
+          >:: fun _ -> assert_equal 4 (num_branches example_balanced_tree))
+       ; ("Find longest branch of tree"
+          >:: fun _ -> assert_equal 5 (longest_branch example_unbalanced_tree))
+       ; ("Find shortest branch of tree"
+          >:: fun _ -> assert_equal 2 (shortest_branch example_unbalanced_tree))
+       ; ("Find shortest branch of tree"
+          >:: fun _ -> assert_equal 2 (shortest_branch example_unbalanced_tree_v2))
+       ; ("Construct a balanced tree"
+          >:: fun _ ->
+          assert_equal
+            (Node
+               ('x', Node ('x', Node ('x', Empty, Empty), Empty), Node ('x', Empty, Empty)))
+            (construct_balanced_tree 4 'x'))
+         ; ("Find all balanced trees"
+            >:: fun _ ->
+            assert_equal
+              [ Node
+                  ( 'x'
+                  , Node ('x', Empty, Empty)
+                  , Node ('x', Node ('x', Empty, Empty), Empty) )
+              ; Node
+                  ( 'x'
+                  , Node ('x', Empty, Empty)
+                  , Node ('x', Empty, Node ('x', Empty, Empty)) )
+              ; Node
+                  ( 'x'
+                  , Node ('x', Node ('x', Empty, Empty), Empty)
+                  , Node ('x', Empty, Empty) )
+              ; Node
+                  ( 'x'
+                  , Node ('x', Empty, Node ('x', Empty, Empty))
+                  , Node ('x', Empty, Empty) )
+              ]
+              (cbal 4 'x'))
        ]
 ;;
 

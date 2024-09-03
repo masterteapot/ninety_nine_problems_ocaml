@@ -6,6 +6,65 @@ type 'a rle =
   | Modone of 'a
   | Modmany of int * 'a
 
+type 'a binary_tree =
+  | Empty
+  | Node of 'a * 'a binary_tree * 'a binary_tree
+
+let example_tree =
+  Node
+    ( 'a'
+    , Node ('b', Node ('d', Empty, Empty), Node ('e', Empty, Empty))
+    , Node ('c', Empty, Node ('f', Node ('g', Empty, Empty), Empty)) )
+;;
+
+let rec num_branches = function
+  | Empty -> 0
+  | Node (_, l, r) -> 1 + num_branches l + num_branches r
+;;
+
+let longest_branch t =
+  let rec aux counter = function
+    | Empty -> counter
+    | Node (_, l, r) -> Int.max (aux (counter + 1) l) (aux (counter + 1) r)
+  in
+  aux 0 t
+;;
+
+let shortest_branch t =
+  let rec aux counter = function
+    | Empty -> counter
+    | Node (_, l, r) -> Int.min (aux (counter + 1) l) (aux (counter + 1) r)
+  in
+  aux 0 t
+;;
+
+let construct_balanced_tree num x =
+  let rec add_node = function
+    | Empty -> failwith "Shouldn't be constructing empty nodes"
+    | Node (v, Empty, r) -> Node (v, Node (x, Empty, Empty), r)
+    | Node (v, l, Empty) -> Node (v, l, Node (x, Empty, Empty))
+    | Node (v, l, r) ->
+      if shortest_branch l <= shortest_branch r
+      then Node (v, add_node l, r)
+      else Node (v, l, add_node r)
+  in
+  let rec aux counter acc =
+    if counter = num then acc else aux (1 + counter) (add_node acc)
+  in
+  aux 1 (Node (x, Empty, Empty))
+;;
+
+(* Do I need to have two internal functions, one for constructing nodes and one for constructing a list of nodes? *)
+(* How can I have something that goes in both directions but also maintains balance? *)
+let cbal num x =
+  let rec aux counter = function
+    | v when counter = num -> v
+    | Empty -> aux (counter + 1) (Node (x, Empty, Empty))
+    | Node (v, l, r) -> Node (v, aux (counter + 1) l, r)
+  in
+  aux 1 (Node (x, Empty, Empty))
+;;
+
 let rec last = function
   | [] -> None
   | x :: [] -> Some x
