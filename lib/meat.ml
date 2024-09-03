@@ -17,6 +17,10 @@ let example_tree =
     , Node ('c', Empty, Node ('f', Node ('g', Empty, Empty), Empty)) )
 ;;
 
+type demo_tree =
+  | Dleaf
+  | Dbranch of int * demo_tree * demo_tree
+
 type bool_expr =
   | Var of string
   | Not of bool_expr
@@ -28,13 +32,18 @@ let rec num_branches = function
   | Node (_, l, r) -> 1 + num_branches l + num_branches r
 ;;
 
-(* (And (Var "a", Or (Var "a", Var "b"))) *)
-let table2 a b e =
-  let rec aux = function
-    | Var x -> [ true, false, true ]
-    | y -> aux y
+(* (* (And (Var "a", Or (Var "a", Var "b"))) *) *)
+let table2 vara varb expr =
+  let rec aux ab bb = function
+    | Var x when x = vara -> ab
+    | Var x when x = varb -> bb
+    | Var _ -> failwith "what is this var?"
+    | Not x -> Bool.not @@ aux ab bb x
+    | And (x, y) -> aux ab bb x && aux ab bb y
+    | Or (x, y) -> aux ab bb x || aux ab bb y
   in
-  aux e
+  let poss = [ true, true; true, false; false, true; false, false ] in
+  List.map (fun x -> fst x, snd x, aux (fst x) (snd x) expr) poss
 ;;
 
 let longest_branch t =
