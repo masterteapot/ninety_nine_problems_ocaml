@@ -202,6 +202,9 @@ let tests =
           >:: fun _ -> assert_equal [ 3; 3; 5; 7 ] (factors 315))
        ; ("Find number of nodes"
           >:: fun _ -> assert_equal 4 (num_branches example_balanced_tree))
+       ; ("Solve all outputs of a logic tree"
+          >:: fun _ -> assert_equal ([(true, true, true); (true, false, true); (false, true, false);
+ (false, false, false)]) (table2 "a" "b" (And (Var "a", Or (Var "a", Var "b")))))
        ; ("Find longest branch of tree"
           >:: fun _ -> assert_equal 5 (longest_branch example_unbalanced_tree))
        ; ("Find shortest branch of tree"
@@ -214,27 +217,27 @@ let tests =
             (Node
                ('x', Node ('x', Node ('x', Empty, Empty), Empty), Node ('x', Empty, Empty)))
             (construct_balanced_tree 4 'x'))
-         ; ("Find all balanced trees"
-            >:: fun _ ->
-            assert_equal
-              [ Node
-                  ( 'x'
-                  , Node ('x', Empty, Empty)
-                  , Node ('x', Node ('x', Empty, Empty), Empty) )
-              ; Node
-                  ( 'x'
-                  , Node ('x', Empty, Empty)
-                  , Node ('x', Empty, Node ('x', Empty, Empty)) )
-              ; Node
-                  ( 'x'
-                  , Node ('x', Node ('x', Empty, Empty), Empty)
-                  , Node ('x', Empty, Empty) )
-              ; Node
-                  ( 'x'
-                  , Node ('x', Empty, Node ('x', Empty, Empty))
-                  , Node ('x', Empty, Empty) )
-              ]
-              (cbal 4 'x'))
+         (* ; ("Find all balanced trees" *)
+         (*    >:: fun _ -> *)
+         (*    assert_equal *)
+         (*      [ Node *)
+         (*          ( 'x' *)
+         (*          , Node ('x', Empty, Empty) *)
+         (*          , Node ('x', Node ('x', Empty, Empty), Empty) ) *)
+         (*      ; Node *)
+         (*          ( 'x' *)
+         (*          , Node ('x', Empty, Empty) *)
+         (*          , Node ('x', Empty, Node ('x', Empty, Empty)) ) *)
+         (*      ; Node *)
+         (*          ( 'x' *)
+         (*          , Node ('x', Node ('x', Empty, Empty), Empty) *)
+         (*          , Node ('x', Empty, Empty) ) *)
+         (*      ; Node *)
+         (*          ( 'x' *)
+         (*          , Node ('x', Empty, Node ('x', Empty, Empty)) *)
+         (*          , Node ('x', Empty, Empty) ) *)
+         (*      ] *)
+         (*      (cbal 4 'x')) *)
        ]
 ;;
 

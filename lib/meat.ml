@@ -17,9 +17,24 @@ let example_tree =
     , Node ('c', Empty, Node ('f', Node ('g', Empty, Empty), Empty)) )
 ;;
 
+type bool_expr =
+  | Var of string
+  | Not of bool_expr
+  | And of bool_expr * bool_expr
+  | Or of bool_expr * bool_expr
+
 let rec num_branches = function
   | Empty -> 0
   | Node (_, l, r) -> 1 + num_branches l + num_branches r
+;;
+
+(* (And (Var "a", Or (Var "a", Var "b"))) *)
+let table2 a b e =
+  let rec aux = function
+    | Var x -> [ true, false, true ]
+    | y -> aux y
+  in
+  aux e
 ;;
 
 let longest_branch t =
