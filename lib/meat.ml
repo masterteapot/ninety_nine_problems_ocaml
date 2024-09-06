@@ -32,6 +32,10 @@ let rec num_branches = function
   | Node (_, l, r) -> 1 + num_branches l + num_branches r
 ;;
 
+type direction =
+  | Left
+  | Right
+
 (* (* (And (Var "a", Or (Var "a", Var "b"))) *) *)
 let table2 vara varb expr =
   let rec aux ab bb = function
@@ -52,6 +56,35 @@ let longest_branch t =
     | Node (_, l, r) -> Int.max (aux (counter + 1) l) (aux (counter + 1) r)
   in
   aux 0 t
+;;
+
+let gray n =
+  let rec mirror lacc racc = function
+    | [] -> List.rev lacc @ racc
+    | hd :: tl -> mirror (("0" ^ hd) :: lacc) (("1" ^ hd) :: racc) tl
+  in
+  let rec aux counter ls =
+    if counter = n then ls else aux (counter + 1) (mirror [] [] ls)
+  in
+  aux 1 [ "0"; "1" ]
+;;
+
+let table vlist expr =
+  let all_truthies ls =
+    let rec aux iacc = function
+      | [] -> [ List.rev iacc ]
+      | hd :: tl -> aux ((hd, true) :: iacc) tl @ aux ((hd, false) :: iacc) tl
+    in
+    aux [] ls
+  in
+  let rec aux ls = function
+    | Var x -> List.assoc x ls
+    | Not x -> Bool.not @@ aux ls x
+    | And (x, y) -> aux ls x && aux ls y
+    | Or (x, y) -> aux ls x || aux ls y
+  in
+  let poss = all_truthies vlist in
+  List.map (fun x -> x, aux x expr) poss
 ;;
 
 let shortest_branch t =

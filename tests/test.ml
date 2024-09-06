@@ -203,8 +203,30 @@ let tests =
        ; ("Find number of nodes"
           >:: fun _ -> assert_equal 4 (num_branches example_balanced_tree))
        ; ("Solve all outputs of a logic tree"
-          >:: fun _ -> assert_equal ([(true, true, true); (true, false, true); (false, true, false);
- (false, false, false)]) (table2 "a" "b" (And (Var "a", Or (Var "a", Var "b")))))
+          >:: fun _ ->
+          assert_equal
+            [ true, true, true
+            ; true, false, true
+            ; false, true, false
+            ; false, false, false
+            ]
+            (table2 "a" "b" (And (Var "a", Or (Var "a", Var "b")))))
+       ; ("Solve all outputs of a logic tree with a list"
+          >:: fun _ ->
+          assert_equal
+            [ [ "a", true; "b", true ], true
+            ; [ "a", true; "b", false ], true
+            ; [ "a", false; "b", true ], false
+            ; [ "a", false; "b", false ], false
+            ]
+            (table [ "a"; "b" ] (And (Var "a", Or (Var "a", Var "b")))))
+       ; ("construct a gray encoding" >:: fun _ -> assert_equal [ "0"; "1" ] (gray 1))
+       ; ("construct a gray encoding"
+          >:: fun _ -> assert_equal [ "00"; "01"; "11"; "10" ] (gray 2))
+       ; ("construct a gray encoding"
+          >:: fun _ ->
+          assert_equal [ "000"; "001"; "011"; "010"; "110"; "111"; "101"; "100" ] (gray 3)
+         )
        ; ("Find longest branch of tree"
           >:: fun _ -> assert_equal 5 (longest_branch example_unbalanced_tree))
        ; ("Find shortest branch of tree"
