@@ -198,8 +198,14 @@ let tests =
           >:: fun _ -> assert_equal 2 (gcd 20536 7826))
        ; ("Euler's totient function to find number of coprime numbers"
           >:: fun _ -> assert_equal 4 (phi 10))
+       ; ("Efficient Euler's totient function to find number of coprime numbers"
+          >:: fun _ -> assert_equal 4 (phi_improved 10))
+       ; ("Efficient Euler's totient function to find number of coprime numbers"
+          >:: fun _ -> assert_equal 12 (phi_improved 13))
        ; ("Find lowest factors of a number"
           >:: fun _ -> assert_equal [ 3; 3; 5; 7 ] (factors 315))
+       ; ("Group lowest factors of a number"
+          >:: fun _ -> assert_equal [ 3, 2; 5, 1; 7, 1 ] (factors_v2 315))
        ; ("Find number of nodes"
           >:: fun _ -> assert_equal 4 (num_branches example_balanced_tree))
        ; ("Solve all outputs of a logic tree"
@@ -220,6 +226,15 @@ let tests =
             ; [ "a", false; "b", false ], false
             ]
             (table [ "a"; "b" ] (And (Var "a", Or (Var "a", Var "b")))))
+       ; ("All primes" >:: fun _ -> assert_equal 1000 (List.length (all_primes 2 7920)))
+       ; ("Goldbachs conjecture" >:: fun _ -> assert_equal (5, 23) (goldbach 28))
+       ; ("Goldbachs conjecture second version"
+          >:: fun _ -> assert_equal (5, 23) (goldbach_v2 28))
+       ; ("Goldbachs list"
+          >:: fun _ ->
+          assert_equal
+            [ 10, (3, 7); 12, (5, 7); 14, (3, 11); 16, (3, 13); 18, (5, 13); 20, (3, 17) ]
+            (goldbach_list 9 20))
        ; ("construct a gray encoding" >:: fun _ -> assert_equal [ "0"; "1" ] (gray 1))
        ; ("construct a gray encoding"
           >:: fun _ -> assert_equal [ "00"; "01"; "11"; "10" ] (gray 2))

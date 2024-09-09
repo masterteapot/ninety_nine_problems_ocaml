@@ -404,7 +404,64 @@ let gcd n1 n2 =
   aux small big
 ;;
 
+let all_primes low high =
+  assert (low <= high);
+  assert (low > 1);
+  let rec aux num acc =
+    let v = is_prime num in
+    if num > high
+    then List.rev acc
+    else if v = true && num > 2
+    then aux (num + 2) (num :: acc)
+    else if v = true
+    then aux (num + 1) (num :: acc)
+    else aux (num + 2) acc
+  in
+  aux low []
+;;
+
 let coprime n1 n2 = gcd n1 n2 = 1
+
+let goldbach num =
+  let primes = all_primes 2 num in
+  let rec is_match x = function
+    | [] -> None
+    | hd :: tl -> if x + hd = num then Some (x, hd) else is_match x tl
+  in
+  let rec aux = function
+    | [] -> failwith "no 2 primes found to equal value"
+    | hd :: tl ->
+      (match is_match hd primes with
+       | Some (x, y) -> x, y
+       | None -> aux tl)
+  in
+  aux primes
+;;
+
+let goldbach_v2 num =
+  let rec aux small =
+    if is_prime small && is_prime (num - small)
+    then small, num - small
+    else aux (small + 1)
+  in
+  aux 2
+;;
+
+let goldbach_list low high =
+  let rec get_even_ints lval rval =
+    if lval > rval
+    then []
+    else if lval mod 2 = 1
+    then get_even_ints (lval + 1) rval
+    else lval :: get_even_ints (lval + 2) rval
+  in
+  let evens = get_even_ints low high in
+  List.map (fun x -> x, goldbach_v2 x) evens
+;;
+
+let goldbach_limit low high limit =
+  List.filter (fun (_, (x, y)) -> x > limit && y > limit) (goldbach_list low high)
+;;
 
 let phi num =
   let rec aux counter =
@@ -426,6 +483,34 @@ let factors num =
     else aux (counter + 1) num acc
   in
   aux 2 num []
+;;
+
+let factors_v2 num =
+  let rec aux counter num = function
+    | (x, c) :: tl as ls when counter = num ->
+      if x = num then rev ((x, c + 1) :: tl) else rev ((num, 1) :: ls)
+    | _ when counter = num -> [ num, 1 ]
+    | (x, c) :: tl as ls when num mod counter = 0 ->
+      if counter = x
+      then aux counter (num / counter) ((x, c + 1) :: tl)
+      else aux counter (num / counter) ((counter, 1) :: ls)
+    | ls when num mod counter = 0 -> aux counter (num / counter) ((counter, 1) :: ls)
+    | x -> aux (counter + 1) num x
+  in
+  aux 2 num []
+;;
+
+let rec pow x = function
+  | 0 -> 1
+  | 1 -> x
+  | n ->
+    let b = pow x (n / 2) in
+    b * b * if n mod 2 = 0 then 1 else x
+;;
+
+let phi_improved num =
+  let f_nums = factors_v2 num in
+  List.fold_left (fun acc (p, m) -> acc * (p - 1) * pow p (m - 1)) 1 f_nums
 ;;
 
 let () = ()
