@@ -20,6 +20,36 @@ let example_unbalanced_tree_v2 =
     , Node ('x', Node ('x', Empty, Empty), Empty) )
 ;;
 
+let example_sudoku =
+  [| [| 0; 0; 4; 8; 0; 0; 0; 1; 7 |]
+   ; [| 6; 7; 0; 9; 0; 0; 0; 0; 0 |]
+   ; [| 5; 0; 8; 0; 3; 0; 0; 0; 4 |]
+   ; [| 3; 0; 0; 7; 4; 0; 1; 0; 0 |]
+   ; [| 0; 6; 9; 0; 0; 0; 7; 8; 0 |]
+   ; [| 0; 0; 1; 0; 6; 9; 0; 0; 5 |]
+   ; [| 1; 0; 0; 0; 8; 0; 3; 0; 6 |]
+   ; [| 0; 0; 0; 0; 0; 6; 0; 9; 1 |]
+   ; [| 2; 4; 0; 0; 0; 1; 5; 0; 0 |]
+  |]
+;;
+
+let example_sudoku_answer =
+  [| [| 9; 3; 4; 8; 2; 5; 6; 1; 7 |]
+   ; [| 6; 7; 2; 9; 1; 4; 8; 5; 3 |]
+   ; [| 5; 1; 8; 6; 3; 7; 9; 2; 4 |]
+   ; [| 3; 2; 5; 7; 4; 8; 1; 6; 9 |]
+   ; [| 4; 6; 9; 1; 5; 3; 7; 8; 2 |]
+   ; [| 7; 8; 1; 2; 6; 9; 4; 3; 5 |]
+   ; [| 1; 9; 7; 5; 8; 2; 3; 4; 6 |]
+   ; [| 8; 5; 3; 4; 7; 6; 2; 9; 1 |]
+   ; [| 2; 4; 6; 3; 9; 1; 5; 7; 8 |]
+  |]
+;;
+
+let example_sudoku_col = [| 8; 9; 0; 7; 0; 0; 0; 0; 0 |]
+let example_sudoku_ans_col = [| 4; 2; 8; 5; 9; 1; 7; 3; 6 |]
+let example_sudoku_box = [| 5; 8; 2; 4; 7; 6; 3; 9; 1 |]
+
 let tests =
   "test suite for stats"
   >::: [ ("last item in string"
@@ -242,6 +272,24 @@ let tests =
           >:: fun _ ->
           assert_equal [ "000"; "001"; "011"; "010"; "110"; "111"; "101"; "100" ] (gray 3)
          )
+       ; ("Sudoku -- Check if row is valid"
+          >:: fun _ -> assert_equal true (sud_valid_row [| 1; 5; 2; 3; 4; 9; 8; 7; 6 |]))
+       ; ("Sudoku -- Check if row is valid -- with missing value"
+          >:: fun _ -> assert_equal false (sud_valid_row [| 0; 5; 2; 3; 4; 9; 8; 7; 6 |])
+         )
+       ; ("Sudoku -- Check if row is valid -- with duplicate value"
+          >:: fun _ -> assert_equal false (sud_valid_row [| 1; 5; 2; 2; 4; 9; 8; 7; 6 |])
+         )
+       ; ("Sudoku -- Get column 3"
+          >:: fun _ -> assert_equal example_sudoku_col (sud_get_col example_sudoku 3))
+       ; ("Sudoku -- Get column 2"
+          >:: fun _ ->
+          assert_equal example_sudoku_ans_col (sud_get_col example_sudoku_answer 2))
+       ; ("Sudoku -- Get box"
+          >:: fun _ ->
+          assert_equal example_sudoku_box (sud_get_box example_sudoku_answer 4 7))
+       ; ("Sudoku -- final answer"
+          >:: fun _ -> assert_equal example_sudoku_answer (sud_solve example_sudoku))
        ; ("Find longest branch of tree"
           >:: fun _ -> assert_equal 5 (longest_branch example_unbalanced_tree))
        ; ("Find shortest branch of tree"

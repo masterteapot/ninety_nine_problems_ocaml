@@ -372,7 +372,7 @@ let full_words num =
     [| "zero"; "one"; "two"; "three"; "four"; "five"; "six"; "seven"; "eight"; "nine" |]
   in
   let rec reducinator acc = function
-    | 0 -> acc
+    | 0 -> if List.length acc > 0 then acc else [ 0 ]
     | x -> reducinator (Int.rem x 10 :: acc) (x / 10)
   in
   let rec aux acc = function
@@ -393,6 +393,106 @@ let is_prime num =
     else aux (counter + 1) (num mod counter <> 0)
   in
   if num < 2 then false else aux 2 true
+;;
+
+let sud_valid_row arr =
+  Array.sort Int.compare arr;
+  arr = [| 1; 2; 3; 4; 5; 6; 7; 8; 9 |]
+;;
+
+let sud_get_col arr int = Array.map (fun x -> Array.get x int) arr
+
+let sud_get_item arr x y =
+  assert (x >= 0);
+  assert (x <= 8);
+  assert (y >= 0);
+  assert (y <= 8);
+  let row = Array.get arr y in
+  Array.get row x
+;;
+
+let flatten_array arr =
+  let len_arr = Array.length arr in
+  assert (Array.for_all (fun a -> Array.length a = len_arr) arr);
+  let new_arr = Array.init (len_arr * len_arr) (( * ) 0) in
+  let rec aux x y =
+    new_arr.((y * len_arr) + x) <- arr.(y).(x);
+    if x = len_arr - 1 && y = len_arr - 1
+    then new_arr
+    else if x = len_arr - 1
+    then aux 0 (y + 1)
+    else aux (x + 1) y
+  in
+  aux 0 0
+;;
+
+let sud_get_box arr x y =
+  assert (x >= 0);
+  assert (x <= 8);
+  assert (y >= 0);
+  assert (y <= 8);
+  let get_3 start arr =
+    [| Array.get arr start; Array.get arr (start + 1); Array.get arr (start + 2) |]
+  in
+  let rows = get_3 (y / 3 * 3) arr in
+  let output = Array.map (get_3 (x / 3 * 3)) rows |> flatten_array in
+  output
+;;
+
+let sud_complete arr =
+  Array.sort Int.compare arr;
+  arr = [| 1; 2; 3; 4; 5; 6; 7; 8; 9 |]
+;;
+
+let sud_missing arr =
+  List.filter
+    (fun i -> not (Array.exists (Int.equal i) arr))
+    [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ]
+;;
+
+let sud_solve arr =
+  let max_len = Array.length arr - 1 in
+  let get_options x y =
+    let missing_row = arr.(y) |> sud_missing in
+    let missing_col = sud_get_col arr x |> sud_missing in
+    let missing_box = sud_get_box arr x y |> sud_missing in
+    List.filter (fun x -> List.mem x missing_col) missing_row
+    |> List.filter (fun x -> List.mem x missing_box)
+  in
+  let get_next_cell x y =
+    if x = max_len && y = max_len
+    then failwith "already at end"
+    else if x = max_len
+    then 0, y + 1
+    else x + 1, y
+  in
+  let rec aux x y =
+    if x = max_len && y = max_len
+    then (
+      arr.(y).(x) <- List.hd (get_options x y);
+      arr)
+    else if arr.(y).(x) > 0
+    then (
+      let next_cell = get_next_cell x y in
+      aux (fst next_cell) (snd next_cell))
+    else (
+      let opts = get_options x y in
+      looper x y opts)
+  and looper x y = function
+    | [] ->
+      arr.(y).(x) <- 0;
+      raise Exit
+    | hd :: tl ->
+      (try
+         arr.(y).(x) <- hd;
+         let next_cell = get_next_cell x y in
+         aux (fst next_cell) (snd next_cell)
+       with
+       | Exit ->
+         arr.(y).(x) <- 0;
+         looper x y tl)
+  in
+  aux 0 0
 ;;
 
 let gcd n1 n2 =
