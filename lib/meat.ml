@@ -36,7 +36,24 @@ type direction =
   | Left
   | Right
 
-(* (* (And (Var "a", Or (Var "a", Var "b"))) *) *)
+
+type arithmas =
+    | Plus
+    | Minus
+    | Num of int
+
+
+let arithmetic ls =
+    let rec evaluate left = function
+        | Plus :: tl -> left + evaluate 0 tl
+        | Minus :: tl -> left - evaluate 0 tl
+        | Num x :: tl -> evaluate x tl
+        | [] -> 0
+    in
+    evaluate 0 ls
+
+let testy = [Num 1; Minus; Num 5; Plus; Num 20]
+
 let table2 vara varb expr =
   let rec aux ab bb = function
     | Var x when x = vara -> ab
