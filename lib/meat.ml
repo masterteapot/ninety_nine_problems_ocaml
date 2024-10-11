@@ -495,15 +495,39 @@ let sud_solve arr =
   aux 0 0
 ;;
 
-(* missing lower values for subsequent stations *)
-let queens_positions num =
-  let options = [ 1; 2; 3; 4; 5; 6; 7; 8 ] in
-  let rec aux acc starter = function
-    | [] -> []
-    | _ when List.length acc = num -> [ List.rev acc ]
-    | hd :: tl as ls -> aux (hd :: acc) tl tl @ aux acc ls starter
+let fold_lefti f init l =
+  let rec loop i acc = function
+    | [] -> acc
+    | x :: xs -> loop (i + 1) (f acc i x) xs
   in
-  aux [] options options
+  loop 0 init l
+;;
+
+let queens_positions num =
+  assert (num > 0);
+  let options = range 1 num in
+  let add_more ls =
+    let my_pos = List.length ls in
+    let my_options =
+      List.filter
+        (fun o ->
+          fold_lefti
+            (fun acc i l ->
+              acc && o <> l && o <> l - (my_pos - i) && o <> l + (my_pos - i))
+            true
+            ls)
+        options
+    in
+    List.map (fun x -> ls @ [ x ]) my_options
+  in
+  let rec aux acc =
+    if List.length (List.hd acc) = num
+    then acc
+    else (
+      let new_acc = List.map add_more acc |> List.flatten |> List.filter (( <> ) []) in
+      aux new_acc)
+  in
+  aux (List.map (fun x -> [ x ]) options)
 ;;
 
 let gcd n1 n2 =
