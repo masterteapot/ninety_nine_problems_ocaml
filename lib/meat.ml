@@ -521,10 +521,12 @@ let queens_positions num =
     List.map (fun x -> ls @ [ x ]) my_options
   in
   let rec aux acc =
-    if List.length (List.hd acc) = num
+    if List.length acc = 0
+    then failwith "No valid solutions for the given number of queens"
+    else if List.length (List.hd acc) = num
     then acc
     else (
-      let new_acc = List.map add_more acc |> List.flatten |> List.filter (( <> ) []) in
+      let new_acc = List.map add_more acc |> List.flatten in
       aux new_acc)
   in
   aux (List.map (fun x -> [ x ]) options)
