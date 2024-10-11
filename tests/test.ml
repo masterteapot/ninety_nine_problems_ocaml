@@ -296,6 +296,8 @@ let tests =
           >:: fun _ -> assert_equal 2 (shortest_branch example_unbalanced_tree))
        ; ("Find shortest branch of tree"
           >:: fun _ -> assert_equal 2 (shortest_branch example_unbalanced_tree_v2))
+       ; ("Solve queens overlaping problem"
+          >:: fun _ -> assert_equal [[3; 1; 4; 2]; [2; 4; 1; 3]] (queens_positions 4))
        ; ("Construct a balanced tree"
           >:: fun _ ->
           assert_equal
